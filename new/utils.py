@@ -15,7 +15,7 @@ def get_X_y(data, target_label, drop_labels=[]):
         data_X = data.drop(drop_label, 1)
     return data_y, data_X
 
-def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0):
+def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0, file_name=None):
     data_y, data_X = get_X_y(data, target_label, drop_labels)
 
     if use_autosklearn:
@@ -72,13 +72,14 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
         r = permutation_importance(model, data_X.iloc[test_index], y_true, n_repeats=10, random_state=0)
         feature_importances.append(copy.deepcopy(r))
 
-        result_dict = {}
-        result_dict['scores'] = scores
-        result_dict['models'] = result_models
-        result_dict['feature_importances'] = feature_importances
+        if type(None) != type(file_name):
+            result_dict = {}
+            result_dict['scores'] = scores
+            result_dict['models'] = result_models
+            result_dict['feature_importances'] = feature_importances
 
-        with open('/tmp/test.p', "wb") as pickle_model_file:
-            pickle.dump(result_dict, pickle_model_file)
+            with open(file_name, "wb") as pickle_model_file:
+                pickle.dump(result_dict, pickle_model_file)
 
 
 
