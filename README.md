@@ -13,9 +13,15 @@ Joint Data Cleaning and Machine Learning [Experiments and Analysis]
 ```
 git clone git@github.com:FelixNeutatz/CleanML.git
 cd CleanML
+exec bash
 conda create -n CleanML python=3.8
 conda activate CleanML
+git pull origin master
 python -m pip install . 
+python -m pip install -U setuptools wheel
+python -m pip install -U "mxnet<2.0.0"
+python -m pip install autogluon
+python -m pip install scipy==1.7.0
 
 # download https://www.dropbox.com/s/nerfrhbrseev928/CleanML-datasets-2020.zip?dl=0
 
