@@ -1,7 +1,19 @@
 import pickle
 import numpy as np
+import pandas as pd
 
 import argparse
+
+def dict2table(check_classifiers, count_classifiers):
+    table = ''
+    for check_i in range(len(check_classifiers)):
+        table += check_classifiers[check_i] + ' & '
+    table += '\n'
+    for check_i in range(len(check_classifiers)):
+        table += str(count_classifiers[check_classifiers[check_i]]) + ' & '
+    print(table + '\n\n')
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--path')
 args = parser.parse_args()
@@ -75,6 +87,11 @@ for i in range(len(results['models'])):
 print(count_classifiers)
 print(np.sum(list(count_classifiers.values())))
 print(len(auto_ml_model.autosklearn_model.get_models_with_weights()))
+
+dict2table(check_classifiers, count_classifiers)
+
+dict2table(check_feature_processors, count_feature_processors)
+
 
 
 print(count_feature_processors)
