@@ -104,27 +104,9 @@ def get_hyperparameter_values(mypath):
 
     return count_classifiers, check_components, count_components_relative, count_models
 
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--path')
-    args = parser.parse_args()
-
-    print(args.path)
-
-    count_classifiers, check_components = get_hyperparameter_values(args.path)
-
-
-
-
-
-    dict2table(check_components, count_classifiers)
-
-    '''
-    print(count_models)
-    
+''' 
     for i in range(len(results['feature_importances'])):
     print('\n\n\n')
     feature_importances = results['feature_importances'][i]
     print(feature_importances)
-    '''
+'''
