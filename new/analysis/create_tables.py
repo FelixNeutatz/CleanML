@@ -4,8 +4,8 @@ import numpy as np
 def create_table(files, title):
     my_latex_table = ''
 
-    print('Outliers')
-    for file_name in ['airbnb_outliers.py', 'credit_outliers.py', 'eeg_outliers.py', 'sensor_outliers.py']:
+    print(title)
+    for file_name in files:
         my_path_clean = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_clean.p"
         my_path_dirty = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_dirty.p"
 
