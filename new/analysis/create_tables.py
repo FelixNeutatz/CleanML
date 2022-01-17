@@ -11,3 +11,5 @@ for file_name in ['airbnb_outliers.py', 'credit_outliers.py', 'eeg_outliers.py',
     result_dirty = pickle.load(open(my_path_dirty, 'rb'))
 
     my_latex_table += "%s & $%.2f \\pm %.2f$ & $%.2f \\pm %.2f$ \\\\ \n" % (file_name.split('.')[0], np.average(result_dirty['scores']), np.std(result_dirty['scores']), np.average(result_clean['scores']), np.std(result_clean['scores']))
+
+print(my_latex_table)
