@@ -48,7 +48,6 @@ def get_hyperparameter_values(mypath):
                         "'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'none'",
                         "'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'normalize'",
                         "'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'power_transformer'",
-                        "'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'quantile_transformer'",
                         "'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'robust_scaler'",
                         "'data_preprocessor:feature_type:numerical_transformer:rescaling:__choice__': 'standardize'",
 
@@ -127,15 +126,13 @@ for clean_file in glob.glob("/home/neutatz/data/cleanml_results/*_clean.p"):
         dict2table(check_components, count_classifiers_dirty)
         #dict2table(check_components, count_classifiers_clean)
 
-        count_diff_rel = {}
-        for k, v in count_components_relative_clean.items():
-            count_diff_rel[k] = v - count_components_relative_dirty[k]
-
         my_latex_table += task_name + ' &'
         for check_i in range(len(check_components)):
-            my_latex_table += str(count_diff_rel[check_components[check_i]]) + ' & '
+            my_latex_table += '%f, ' % (count_components_relative_clean[check_components[check_i]],)
+        for check_i in range(len(check_components)):
+            my_latex_table += '%f, ' % (count_components_relative_dirty[check_components[check_i]],)
         my_latex_table = my_latex_table[:-2]
-        my_latex_table += '\\\\ \n'
+        my_latex_table += '\n'
     except Exception as e:
         pass
 
