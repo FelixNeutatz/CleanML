@@ -66,51 +66,54 @@ def get_feature_importances(mypath):
     return np.average(feature_importances, axis=0)
 
 for clean_file in glob.glob("/home/neutatz/data/cleanml_results/*_clean.p"):
-    task_name = clean_file.split('/')[-1][:-11]
-    dirty_file = clean_file[:-7] + 'dirty.p'
-    print(task_name)
+    try:
+        task_name = clean_file.split('/')[-1][:-11]
+        dirty_file = clean_file[:-7] + 'dirty.p'
+        print(task_name)
 
-    target = pointer_dict[task_name]['target']
-    drop_labels = pointer_dict[task_name]['drop_labels']
-    clean_path = pointer_dict[task_name]['clean_path']
-    dirty_path = pointer_dict[task_name]['dirty_path']
+        target = pointer_dict[task_name]['target']
+        drop_labels = pointer_dict[task_name]['drop_labels']
+        clean_path = pointer_dict[task_name]['clean_path']
+        dirty_path = pointer_dict[task_name]['dirty_path']
 
-    #try:
+        #try:
 
-    feature_importances_average_clean = get_feature_importances(clean_file)
-    feature_importances_average_dirty = get_feature_importances(dirty_file)
+        feature_importances_average_clean = get_feature_importances(clean_file)
+        feature_importances_average_dirty = get_feature_importances(dirty_file)
 
-    fnames = get_names(clean_path, drop_labels, target)
+        fnames = get_names(clean_path, drop_labels, target)
 
-    #print(feature_importances_average_clean)
-    #print(feature_importances_average_dirty)
-
-
-    feature_importances_average_clean_scaled = MinMaxScaler().fit_transform(feature_importances_average_clean.reshape(-1, 1)).flatten()
-    feature_importances_average_dirty_scaled = MinMaxScaler().fit_transform(feature_importances_average_dirty.reshape(-1, 1)).flatten()
-    #print('clean scaled: ' + str(feature_importances_average_clean_scaled))
-    #print_list(feature_importances_average_clean_scaled)
-    #print('dirty scaled: ' + str(feature_importances_average_dirty_scaled))
-    #print_list(feature_importances_average_dirty_scaled)
+        #print(feature_importances_average_clean)
+        #print(feature_importances_average_dirty)
 
 
-    errors = get_errors(clean_path, dirty_path, target, drop_labels)
-    #print(errors)
-    #print('diff: ' + str(feature_importances_average_clean - feature_importances_average_dirty))
-    #print('names: ' + str(fnames))
+        feature_importances_average_clean_scaled = MinMaxScaler().fit_transform(feature_importances_average_clean.reshape(-1, 1)).flatten()
+        feature_importances_average_dirty_scaled = MinMaxScaler().fit_transform(feature_importances_average_dirty.reshape(-1, 1)).flatten()
+        #print('clean scaled: ' + str(feature_importances_average_clean_scaled))
+        #print_list(feature_importances_average_clean_scaled)
+        #print('dirty scaled: ' + str(feature_importances_average_dirty_scaled))
+        #print_list(feature_importances_average_dirty_scaled)
 
-    sorted_ids = np.argsort(feature_importances_average_clean_scaled *-1)
 
-    my_latex_table += '\\begin{table*}\n\\smallestfont\n\\centering\n\\caption{Impact on Feature Importance for dirty Data (%s).}\n\label{tab:featureimportance%s}\n' % (task_name.replace('_', ' '), task_name.replace('_', ''))
-    my_latex_table += '\\begin{tabular}{@{}lccc@{}}\n'
-    my_latex_table += '\\toprule\n'
-    my_latex_table += 'Feature Names & Scaled Importance Clean & Scaled Importance Dirty & Number Errors \\\\'
-    my_latex_table += '\\midrule\n'
-    for my_index in range(len(fnames)):
-        ii = sorted_ids[my_index]
-        my_latex_table += '%s & %.2f & %.2f & %d \\\\ \n' % (fnames[ii], feature_importances_average_clean_scaled[ii], feature_importances_average_dirty_scaled[ii], errors[ii])
-    my_latex_table += '\\bottomrule\n'
-    my_latex_table += '\\end{tabular}\n\\vspace{-1.5em}\n\\end{table*}\n\n\n\n'
+        errors = get_errors(clean_path, dirty_path, target, drop_labels)
+        #print(errors)
+        #print('diff: ' + str(feature_importances_average_clean - feature_importances_average_dirty))
+        #print('names: ' + str(fnames))
+
+        sorted_ids = np.argsort(feature_importances_average_clean_scaled *-1)
+
+        my_latex_table += '\\begin{table*}\n\\smallestfont\n\\centering\n\\caption{Impact on Feature Importance for dirty Data (%s).}\n\label{tab:featureimportance%s}\n' % (task_name.replace('_', ' '), task_name.replace('_', ''))
+        my_latex_table += '\\begin{tabular}{@{}lccc@{}}\n'
+        my_latex_table += '\\toprule\n'
+        my_latex_table += 'Feature Names & Scaled Importance Clean & Scaled Importance Dirty & Number Errors \\\\'
+        my_latex_table += '\\midrule\n'
+        for my_index in range(len(fnames)):
+            ii = sorted_ids[my_index]
+            my_latex_table += '%s & %.2f & %.2f & %d \\\\ \n' % (fnames[ii], feature_importances_average_clean_scaled[ii], feature_importances_average_dirty_scaled[ii], errors[ii])
+        my_latex_table += '\\bottomrule\n'
+        my_latex_table += '\\end{tabular}\n\\vspace{-1.5em}\n\\end{table*}\n\n\n\n'
+    except Exception as e:
+        pass
 
 print(my_latex_table)
 
