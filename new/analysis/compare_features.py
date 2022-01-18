@@ -31,6 +31,67 @@ pointer_dict['sensor_outliers']['clean_path'] = '/home/neutatz/Software/CleanML/
 pointer_dict['sensor_outliers']['target'] = "moteid"
 pointer_dict['sensor_outliers']['drop_labels'] = []
 
+pointer_dict['airbnb_missing_values'] = {}
+pointer_dict['airbnb_missing_values']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Airbnb/missing_values/dirty_train.csv'
+pointer_dict['airbnb_missing_values']['clean_path'] = '/home/neutatz/Software/CleanML/data/Airbnb/missing_values/impute_holoclean_train.csv'
+pointer_dict['airbnb_missing_values']['target'] = 'Rating'
+pointer_dict['airbnb_missing_values']['drop_labels'] = []
+
+pointer_dict['credit_missing_values'] = {}
+pointer_dict['credit_missing_values']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Credit/missing_values/dirty_train.csv'
+pointer_dict['credit_missing_values']['clean_path'] = '/home/neutatz/Software/CleanML/data/Credit/missing_values/impute_holoclean_train.csv'
+pointer_dict['credit_missing_values']['target'] = "SeriousDlqin2yrs"
+pointer_dict['credit_missing_values']['drop_labels'] = []
+
+pointer_dict['marketing_missing_values'] = {}
+pointer_dict['marketing_missing_values']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Marketing/missing_values/dirty_train.csv'
+pointer_dict['marketing_missing_values']['clean_path'] = '/home/neutatz/Software/CleanML/data/Marketing/missing_values/impute_holoclean_train.csv'
+pointer_dict['marketing_missing_values']['target'] = 'Income'
+pointer_dict['marketing_missing_values']['drop_labels'] = []
+
+pointer_dict['titanic_missing_values'] = {}
+pointer_dict['titanic_missing_values']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Titanic/raw/raw.csv'
+pointer_dict['titanic_missing_values']['clean_path'] = '/home/neutatz/Software/CleanML/data/Titanic/raw/Holoclean_mv_clean.csv'
+pointer_dict['titanic_missing_values']['target'] = "Survived"
+pointer_dict['titanic_missing_values']['drop_labels'] = ['PassengerId', 'Name']
+
+pointer_dict['us_census_missing_values'] = {}
+pointer_dict['us_census_missing_values']['dirty_path'] = '/home/neutatz/Software/CleanML/data/USCensus/missing_values/dirty_train.csv'
+pointer_dict['us_census_missing_values']['clean_path'] = '/home/neutatz/Software/CleanML/data/USCensus/missing_values/impute_holoclean_train.csv'
+pointer_dict['us_census_missing_values']['target'] = "Income"
+pointer_dict['us_census_missing_values']['drop_labels'] = []
+
+pointer_dict['company_inconsistency'] = {}
+pointer_dict['company_inconsistency']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Company/inconsistency/dirty_train.csv'
+pointer_dict['company_inconsistency']['clean_path'] = '/home/neutatz/Software/CleanML/data/Company/inconsistency/clean_train.csv'
+pointer_dict['company_inconsistency']['target'] = "Sentiment"
+pointer_dict['company_inconsistency']['drop_labels'] = ["Date", "Unnamed: 0", "City"]
+
+pointer_dict['movie_inconsistency'] = {}
+pointer_dict['movie_inconsistency']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Movie/inconsistency/dirty_train.csv'
+pointer_dict['movie_inconsistency']['clean_path'] = '/home/neutatz/Software/CleanML/data/Movie/inconsistency/clean_train.csv'
+pointer_dict['movie_inconsistency']['target'] = "genres"
+pointer_dict['movie_inconsistency']['drop_labels'] = []
+
+pointer_dict['restaurant_inconsistency'] = {}
+pointer_dict['restaurant_inconsistency']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Restaurant/inconsistency/dirty_train.csv'
+pointer_dict['restaurant_inconsistency']['clean_path'] = '/home/neutatz/Software/CleanML/data/Restaurant/inconsistency/clean_train.csv'
+pointer_dict['restaurant_inconsistency']['target'] = "priceRange"
+pointer_dict['restaurant_inconsistency']['drop_labels'] = ["streetAddress", "telephone", "website"]
+
+pointer_dict['university_inconsistency'] = {}
+pointer_dict['university_inconsistency']['dirty_path'] = '/home/neutatz/Software/CleanML/data/University/inconsistency/dirty_train.csv'
+pointer_dict['university_inconsistency']['clean_path'] = '/home/neutatz/Software/CleanML/data/University/inconsistency/clean_train.csv'
+pointer_dict['university_inconsistency']['target'] = "expenses thous$"
+pointer_dict['university_inconsistency']['drop_labels'] = ["university name", "academic-emphasis"]
+
+'''
+pointer_dict['airbnb_duplicates'] = {}
+pointer_dict['airbnb_duplicates']['dirty_path'] = '/home/neutatz/Software/CleanML/data/Airbnb/duplicates/dirty_train.csv'
+pointer_dict['airbnb_duplicates']['clean_path'] = '/home/neutatz/Software/CleanML/data/Airbnb/duplicates/clean_train.csv'
+pointer_dict['airbnb_duplicates']['target'] = 'Rating'
+pointer_dict['airbnb_duplicates']['drop_labels'] = []
+'''
 
 
 my_latex_table = ''
@@ -48,12 +109,21 @@ def get_names(clean_path, drop_variables, target):
     return df.columns
 
 
-def get_errors(clean_path, dirty_path, target_label, drop_labels=[]):
+def get_errors(clean_path, dirty_path, target_label, drop_labels=[], fraction=False):
     holoclean_train = pd.read_csv(clean_path)
     dirty_train = pd.read_csv(dirty_path)
     X_clean = get_X_y(holoclean_train, target_label, drop_labels)
     X_dirty = get_X_y(dirty_train, target_label, drop_labels)
-    return np.sum(X_clean != X_dirty).values
+
+    print('len: ' + str(len(X_clean)))
+
+    errors = np.sum(X_clean != X_dirty).values
+    print(errors)
+    print(len(errors))
+    if fraction:
+        errors = errors/len(X_clean)
+
+    return errors
 
 def get_feature_importances(mypath):
     results = pickle.load(open(mypath, 'rb'))
@@ -76,8 +146,6 @@ for clean_file in glob.glob("/home/neutatz/data/cleanml_results/*_clean.p"):
         clean_path = pointer_dict[task_name]['clean_path']
         dirty_path = pointer_dict[task_name]['dirty_path']
 
-        #try:
-
         feature_importances_average_clean = get_feature_importances(clean_file)
         feature_importances_average_dirty = get_feature_importances(dirty_file)
 
@@ -96,6 +164,7 @@ for clean_file in glob.glob("/home/neutatz/data/cleanml_results/*_clean.p"):
 
 
         errors = get_errors(clean_path, dirty_path, target, drop_labels)
+        error_fraction = get_errors(clean_path, dirty_path, target, drop_labels, fraction=True)
         #print(errors)
         #print('diff: ' + str(feature_importances_average_clean - feature_importances_average_dirty))
         #print('names: ' + str(fnames))
@@ -105,11 +174,11 @@ for clean_file in glob.glob("/home/neutatz/data/cleanml_results/*_clean.p"):
         my_latex_table += '\\begin{table*}\n\\smallestfont\n\\centering\n\\caption{Impact on Feature Importance for dirty Data (%s).}\n\label{tab:featureimportance%s}\n' % (task_name.replace('_', ' '), task_name.replace('_', ''))
         my_latex_table += '\\begin{tabular}{@{}lccc@{}}\n'
         my_latex_table += '\\toprule\n'
-        my_latex_table += 'Feature Names & Scaled Importance Clean & Scaled Importance Dirty & Number Errors \\\\'
+        my_latex_table += 'Feature Names & Scaled Importance Clean & Scaled Importance Dirty & Number Errors & Error Fraction \\\\'
         my_latex_table += '\\midrule\n'
         for my_index in range(len(fnames)):
             ii = sorted_ids[my_index]
-            my_latex_table += '%s & %.2f & %.2f & %d \\\\ \n' % (fnames[ii], feature_importances_average_clean_scaled[ii], feature_importances_average_dirty_scaled[ii], errors[ii])
+            my_latex_table += '%s & %.2f & %.2f & %d & %.3f \\\\ \n' % (fnames[ii].replace('_', ' ').replace('%', '\%'), feature_importances_average_clean_scaled[ii], feature_importances_average_dirty_scaled[ii], errors[ii], error_fraction[ii])
         my_latex_table += '\\bottomrule\n'
         my_latex_table += '\\end{tabular}\n\\vspace{-1.5em}\n\\end{table*}\n\n\n\n'
     except Exception as e:
