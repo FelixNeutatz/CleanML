@@ -10,12 +10,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-mislabel_percent', type=float)
-    parser.add_argument('-clean_validation_labels', type=bool)
+    parser.add_argument('-clean_validation_labels')
     args = parser.parse_args()
-
+    clean_validation_labels = args.clean_validation_labels == 'True'
     file_name = save_path + os.path.basename(__file__) + '_p' + str(args.mislabel_percent) + '_clean_val_' + str(
-        args.clean_validation_labels) + '_'
+        clean_validation_labels) + '_'
     run(clean_path, None, target_label, drop_labels, mislabel_percent=args.mislabel_percent, file_name=file_name,
-        clean_validation_labels=args.clean_validation_labels, avoid_clean_eval=True)
-
+        clean_validation_labels=clean_validation_labels, avoid_clean_eval=True)
 
