@@ -7,6 +7,8 @@ import numpy as np
 import copy
 from sklearn.inspection import permutation_importance
 import pickle
+from sklearn.model_selection import StratifiedShuffleSplit
+import sklearn
 
 def get_X_y(data, target_label, drop_labels=[]):
     data_y = data[target_label]
@@ -15,7 +17,7 @@ def get_X_y(data, target_label, drop_labels=[]):
         data_X = data.drop(drop_label, 1)
     return data_y, data_X
 
-def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0, file_name=None):
+def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0, file_name=None, clean_validation_labels=False):
     data_y, data_X = get_X_y(data, target_label, drop_labels)
 
     if use_autosklearn:
@@ -32,11 +34,29 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
     for train_index, test_index in fold_ids:
         model = None
 
+        X_train = data_X.iloc[train_index, :]
         y_train = copy.deepcopy(data_y.values[train_index])
+
+        y_train_all = copy.deepcopy(data_y.values[train_index])
+
+        test_index_clean = None
+        if clean_validation_labels:
+            sss = StratifiedShuffleSplit(n_splits=1, test_size=0.3, random_state=0)
+            train_index_dirty, test_index_clean = list(sss.split(X_train, y_train))[0]
+
+            y_train = y_train[train_index_dirty]
+            print('clean validation labels')
+
+
+
         if mislabels_percent > 0:
             # find indices for each class
             class_values = np.unique(y_train)
+
             mislabels_percent_per_class = mislabels_percent / len(class_values)
+
+            print(np.unique(y_train, return_counts=True))
+            print(int(mislabels_percent_per_class * len(y_train_all)))
 
             indices_all = []
             for class_i in range(len(class_values)):
@@ -45,7 +65,7 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
                 indices_all.append(indices_class_i)
 
             for class_i in range(len(class_values)):
-                for change_i in range(int(mislabels_percent_per_class * len(y_train))):
+                for change_i in range(int(mislabels_percent_per_class * len(y_train_all))):
                     class_choice = copy.deepcopy(class_values)
                     class_choice = np.delete(class_choice, [class_i], None)
                     new_value = np.random.choice(class_choice)
@@ -54,11 +74,14 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
             #print('error fraction: ' + str(np.sum(y_train != data_y.values[train_index]) / float(len(y_train))))
 
         if use_autosklearn:
-            model = AutoSklearnModel()
-            model.fit(X=data_X.iloc[train_index, :], y=y_train, feat_type=feat_type)
+            resampling_strategy = 'holdout'
+            if clean_validation_labels:
+                resampling_strategy = sklearn.model_selection.PredefinedSplit(test_fold=test_index_clean)
+            model = AutoSklearnModel(resampling_strategy=resampling_strategy)
+            model.fit(X=data_X.iloc[train_index, :], y=y_train_all, feat_type=feat_type)
         else:
             model = AutoGluonModel()
-            model.fit(X=data_X.iloc[train_index, :], y=y_train)
+            model.fit(X=data_X.iloc[train_index, :], y=y_train_all)
 
         result_models.append(copy.deepcopy(model))
 
@@ -100,7 +123,9 @@ def get_feat_type(data, target_label, drop_labels=[]):
     ]
     return feat_type
 
-def run(clean_path, dirty_path, target_label, drop_labels=[], use_autosklearn=True, mislabel_percent=0.0, file_name=None):
+
+
+def run(clean_path, dirty_path, target_label, drop_labels=[], use_autosklearn=True, mislabel_percent=0.0, file_name=None, clean_validation_labels=False, avoid_clean_eval=False):
     holoclean_train = pd.read_csv(clean_path)
     dirty_train = None
     if mislabel_percent == 0.0:
@@ -110,12 +135,13 @@ def run(clean_path, dirty_path, target_label, drop_labels=[], use_autosklearn=Tr
     fold_ids = get_fold_ids(holoclean_train, target_label, drop_labels)
     feat_type = get_feat_type(holoclean_train, target_label, drop_labels)
     if mislabel_percent > 0.0:
-        dirty_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, mislabels_percent=mislabel_percent, file_name=file_name + '_dirty.p')
+        dirty_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, mislabels_percent=mislabel_percent, file_name=file_name + '_dirty.p', clean_validation_labels=clean_validation_labels)
     else:
         dirty_scores = eval(dirty_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, file_name=file_name + '_dirty.p')
-    clean_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, file_name=file_name + '_clean.p')
 
+    if not avoid_clean_eval:
+        clean_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, file_name=file_name + '_clean.p')
+        print('clean scores: ' + str(clean_scores))
     print('dirty scores: ' + str(dirty_scores))
-    print('clean scores: ' + str(clean_scores))
 
     #print('number of errors: ' + str(np.sum(holoclean_train != dirty_train)))
