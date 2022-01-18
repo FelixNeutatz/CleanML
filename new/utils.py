@@ -14,7 +14,7 @@ def get_X_y(data, target_label, drop_labels=[]):
     data_y = data[target_label]
     data_X = data.drop(target_label, 1)
     for drop_label in drop_labels:
-        data_X = data.drop(drop_label, 1)
+        data_X = data_X.drop(drop_label, 1)
     return data_y, data_X
 
 def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0, file_name=None, clean_validation_labels=False):
