@@ -99,7 +99,7 @@ my_latex_table = ''
 def get_X_y(data, target_label, drop_labels=[]):
     data_X = data.drop(target_label, 1)
     for drop_label in drop_labels:
-        data_X = data.drop(drop_label, 1)
+        data_X = data_X.drop(drop_label, 1)
     return data_X
 
 def get_names(clean_path, drop_variables, target):
@@ -172,7 +172,7 @@ for clean_file in glob.glob("/home/neutatz/data/cleanml_results/*_clean.p"):
         sorted_ids = np.argsort(feature_importances_average_clean_scaled *-1)
 
         my_latex_table += '\\begin{table*}\n\\smallestfont\n\\centering\n\\caption{Impact on Feature Importance for dirty Data (%s).}\n\label{tab:featureimportance%s}\n' % (task_name.replace('_', ' '), task_name.replace('_', ''))
-        my_latex_table += '\\begin{tabular}{@{}lccc@{}}\n'
+        my_latex_table += '\\begin{tabular}{@{}lcccc@{}}\n'
         my_latex_table += '\\toprule\n'
         my_latex_table += 'Feature Names & Scaled Importance Clean & Scaled Importance Dirty & Number Errors & Error Fraction \\\\'
         my_latex_table += '\\midrule\n'
