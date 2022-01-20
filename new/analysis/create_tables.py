@@ -6,13 +6,16 @@ def create_table(files, title):
 
     print(title)
     for file_name in files:
-        my_path_clean = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_clean.p"
-        my_path_dirty = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_dirty.p"
+        try:
+            my_path_clean = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_clean.p"
+            my_path_dirty = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_dirty.p"
 
-        result_clean = pickle.load(open(my_path_clean, 'rb'))
-        result_dirty = pickle.load(open(my_path_dirty, 'rb'))
+            result_clean = pickle.load(open(my_path_clean, 'rb'))
+            result_dirty = pickle.load(open(my_path_dirty, 'rb'))
 
-        my_latex_table += "%s & $%.2f \\pm %.2f$ & $%.2f \\pm %.2f$ \\\\ \n" % (file_name.split('.')[0], np.average(result_dirty['scores']), np.std(result_dirty['scores']), np.average(result_clean['scores']), np.std(result_clean['scores']))
+            my_latex_table += "%s & $%.2f \\pm %.2f$ & $%.2f \\pm %.2f$ \\\\ \n" % (file_name.split('.')[0], np.average(result_dirty['scores']), np.std(result_dirty['scores']), np.average(result_clean['scores']), np.std(result_clean['scores']))
+        except Exception as e:
+            pass
 
     print(my_latex_table)
     print('\n\n')
