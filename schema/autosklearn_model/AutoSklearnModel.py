@@ -10,7 +10,8 @@ class AutoSklearnModel(ClassifierMixin, BaseEstimator, metaclass=ABCMeta):
                                                                              metric=balanced_accuracy,
                                                                              n_jobs=20,
                                                                              memory_limit=200072,
-                                                                             resampling_strategy=resampling_strategy)
+                                                                             resampling_strategy=resampling_strategy,
+                                                                             exclude={'feature_preprocessor':["fast_ica"]})
 
     def fit(self, X, y, feat_type=None):
         self.autosklearn_model.fit(X.copy(), y.copy())
