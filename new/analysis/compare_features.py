@@ -96,6 +96,18 @@ pointer_dict['airbnb_duplicates']['drop_labels'] = []
 
 my_latex_table = ''
 
+def remove_whitespace(my_str):
+    try:
+        return my_str.strip()
+    except:
+        return my_str
+
+def remove_noise(my_str):
+    try:
+        return float("%.3f" % my_str)
+    except:
+        return my_str
+
 def get_X_y(data, target_label, drop_labels=[]):
     data_X = data.drop(target_label, 1)
     for drop_label in drop_labels:
@@ -115,7 +127,10 @@ def get_errors(clean_path, dirty_path, target_label, drop_labels=[], fraction=Fa
     X_clean = get_X_y(holoclean_train, target_label, drop_labels)
     X_dirty = get_X_y(dirty_train, target_label, drop_labels)
 
-    print('len: ' + str(len(X_clean)))
+    for col in X_clean.columns:
+        X_clean[col] = X_clean[col].apply(remove_whitespace).apply(remove_noise)
+    for col in X_dirty.columns:
+        X_dirty[col] = X_dirty[col].apply(remove_whitespace).apply(remove_noise)
 
     errors = np.sum(X_clean != X_dirty).values
     print(errors)
