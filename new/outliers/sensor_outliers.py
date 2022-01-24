@@ -7,8 +7,8 @@ if __name__ == "__main__":
     dirty_path = '/home/neutatz/Software/CleanML/data/Sensor/outliers/dirty_train.csv'
     clean_path = '/home/neutatz/Software/CleanML/data/Sensor/outliers/clean_HC_impute_holoclean_train.csv'
     save_path = '/home/neutatz/data/cleanml_results/'
-    file_name = save_path + os.path.basename(__file__)
+    file_name = save_path + os.path.basename(__file__) + '_autoclean_'
 
-    run(clean_path, dirty_path, target_label, drop_labels, file_name=file_name)
+    run(clean_path, dirty_path, target_label, drop_labels, file_name=file_name, avoid_clean_eval=True)
 
 
