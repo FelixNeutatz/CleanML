@@ -13,7 +13,7 @@ class AutoSklearnModel(ClassifierMixin, BaseEstimator, metaclass=ABCMeta):
                                                                              memory_limit=200072,
                                                                              resampling_strategy=resampling_strategy,
                                                                              exclude={'feature_preprocessor':["fast_ica"]},
-                                                                             temporary_directory='/home/neutatz/data/clean_auto/tmp/' + 'tmp' + str(time.time()),
+                                                                             tmp_folder='/home/neutatz/data/clean_auto/tmp/' + 'tmp' + str(time.time()),
                                                                              resampling_strategy_arguments=resampling_strategy_arguments)
 
     def fit(self, X, y, feat_type=None):
