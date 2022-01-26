@@ -5,7 +5,7 @@ from autosklearn.metrics import balanced_accuracy
 import time
 
 
-class AutoSklearnModel:
+class AutoSklearnModel(ClassifierMixin, BaseEstimator, metaclass=ABCMeta):
     def __init__(self, resampling_strategy='holdout', resampling_strategy_arguments=None):
         self.autosklearn_model = autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=20*60,
                                                                              metric=balanced_accuracy,
