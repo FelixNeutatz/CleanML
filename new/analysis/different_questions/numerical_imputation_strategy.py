@@ -59,7 +59,7 @@ def get_hyperparameter_values(mypath):
     return count_classifiers, check_components, count_components_relative
 
 #_autoclean_1h__dirty.p
-for dirty_file in glob.glob("/home/neutatz/phd2/cleanML_my/*autoclean__dirty.p"):
+for dirty_file in glob.glob("/home/neutatz/data/cleanml_results/*autoclean__dirty.p"):
 #for dirty_file in glob.glob("/home/neutatz/phd2/cleanML_my/*autoclean_1h__dirty.p"):
     task_name = dirty_file.split('/')[-1][:-11]
 
