@@ -14,10 +14,10 @@ class AutoSklearnModel:
                                                                              resampling_strategy=resampling_strategy,
                                                                              exclude={'feature_preprocessor':["fast_ica"]},
                                                                              tmp_folder='/home/neutatz/data/clean_auto/tmp/' + 'tmp' + str(time.time()),
-                                                                             output_folder='/home/neutatz/data/clean_auto/out/' + 'out' + str(time.time(),
+                                                                             output_folder='/home/neutatz/data/clean_auto/out/' + 'out' + str(time.time()),
                                                                              resampling_strategy_arguments=resampling_strategy_arguments)
 
-    def fit(self, X, y, feat_type):
+    def fit(self, X, y, feat_type=None):
         self.autosklearn_model.fit(X.copy(), y.copy(), feat_type=feat_type)
         self.autosklearn_model.refit(X.copy(), y.copy())
 
