@@ -2,17 +2,21 @@ from abc import ABCMeta, abstractmethod
 from sklearn.base import BaseEstimator, ClassifierMixin
 import autosklearn.classification
 from autosklearn.metrics import balanced_accuracy
+import time
 
 
 class AutoSklearnModel(ClassifierMixin, BaseEstimator, metaclass=ABCMeta):
     def __init__(self, resampling_strategy='holdout'):
-        self.autosklearn_model = autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=20*60, #20*60
+        self.autosklearn_model = autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=60*60, #20*60
                                                                              n_jobs=20,#20
                                                                              ml_memory_limit=200072,
                                                                              ensemble_memory_limit=200072,
                                                                              initial_configurations_via_metalearning=0,
                                                                              resampling_strategy=resampling_strategy,
-                                                                             exclude_preprocessors=['fast_ica'])
+                                                                             exclude_preprocessors=['fast_ica'],
+                                                                             tmp_folder='/home/neutatz/data/clean_auto/tmp/' + 'tmp' + str(time.time()),
+                                                                             output_folder='/home/neutatz/data/clean_auto/out/' + 'out' + str(time.time())
+                                                                             )
 
 
 
