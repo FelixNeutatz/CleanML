@@ -17,7 +17,7 @@ def get_X_y(data, target_label, drop_labels=[]):
         data_X = data_X.drop(drop_label, 1)
     return data_y, data_X
 
-def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0, file_name=None, clean_validation_labels=False):
+def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0, file_name=None, clean_validation_labels=False, cv_folds=None):
     data_y, data_X = get_X_y(data, target_label, drop_labels)
 
     if use_autosklearn:
@@ -75,9 +75,13 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
 
         if use_autosklearn:
             resampling_strategy = 'holdout'
+            resampling_strategy_arguments = None
             if clean_validation_labels:
                 resampling_strategy = sklearn.model_selection.PredefinedSplit(test_fold=test_index_clean)
-            model = AutoSklearnModel(resampling_strategy=resampling_strategy)
+            if type(cv_folds) != type(None):
+                resampling_strategy = 'cv'
+                resampling_strategy_arguments = {'folds': cv_folds}
+            model = AutoSklearnModel(resampling_strategy=resampling_strategy, resampling_strategy_arguments=resampling_strategy_arguments)
             model.fit(X=data_X.iloc[train_index, :], y=y_train_all, feat_type=feat_type)
         else:
             model = AutoGluonModel()
@@ -125,7 +129,7 @@ def get_feat_type(data, target_label, drop_labels=[]):
 
 
 
-def run(clean_path, dirty_path, target_label, drop_labels=[], use_autosklearn=True, mislabel_percent=0.0, file_name=None, clean_validation_labels=False, avoid_clean_eval=False):
+def run(clean_path, dirty_path, target_label, drop_labels=[], use_autosklearn=True, mislabel_percent=0.0, file_name=None, clean_validation_labels=False, avoid_clean_eval=False, cv_folds=None):
     holoclean_train = pd.read_csv(clean_path)
     dirty_train = None
     if mislabel_percent == 0.0:
@@ -135,12 +139,12 @@ def run(clean_path, dirty_path, target_label, drop_labels=[], use_autosklearn=Tr
     fold_ids = get_fold_ids(holoclean_train, target_label, drop_labels)
     feat_type = get_feat_type(holoclean_train, target_label, drop_labels)
     if mislabel_percent > 0.0:
-        dirty_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, mislabels_percent=mislabel_percent, file_name=file_name + '_dirty.p', clean_validation_labels=clean_validation_labels)
+        dirty_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, mislabels_percent=mislabel_percent, file_name=file_name + '_dirty.p', clean_validation_labels=clean_validation_labels, cv_folds=cv_folds)
     else:
-        dirty_scores = eval(dirty_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, file_name=file_name + '_dirty.p')
+        dirty_scores = eval(dirty_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, file_name=file_name + '_dirty.p', cv_folds=cv_folds)
 
     if not avoid_clean_eval:
-        clean_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, file_name=file_name + '_clean.p')
+        clean_scores = eval(holoclean_train, target_label, fold_ids, drop_labels, feat_type, use_autosklearn, file_name=file_name + '_clean.p', cv_folds=cv_folds)
         print('clean scores: ' + str(clean_scores))
     print('dirty scores: ' + str(dirty_scores))
 
