@@ -16,9 +16,6 @@ def get_hyperparameter_values(mypath):
         check_components.append("'data_preprocessing:numerical_transformer:outlier_detection:detection:use_outlier_detection"+ str(i)+"': 'True'",
                         )
 
-
-
-
     count_classifiers = {}
 
     count_classifiers['lof'] = []
@@ -87,9 +84,10 @@ def get_hyperparameter_values(mypath):
     return count_classifiers, check_components, count_components_relative
 
 #_autoclean_1h__dirty.p
-for dirty_file in glob.glob("/home/neutatz/data/cleanml_results/*autoclean_1h__dirty.p"):
+for dirty_file in [0]:#glob.glob("/home/neutatz/data/cleanml_results/*autoclean_1h__dirty.p"):
 #for dirty_file in glob.glob("/home/neutatz/phd2/cleanML_my/*autoclean_1h__dirty.p"):
 #for dirty_file in glob.glob("/home/neutatz/phd2/cleanML_my/*autoclean_1h__dirty.p"):
+    dirty_file = "/home/neutatz/data/cleanml_results/marketing_missing_values.py_autoclean__dirty.p"
     task_name = dirty_file.split('/')[-1][:-11]
 
 
