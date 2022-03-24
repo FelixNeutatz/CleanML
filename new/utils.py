@@ -9,6 +9,10 @@ from sklearn.inspection import permutation_importance
 import pickle
 from sklearn.model_selection import StratifiedShuffleSplit
 import sklearn
+from sklearn import preprocessing
+
+def to_str(data):
+    return str(data)
 
 def get_X_y(data, target_label, drop_labels=[]):
     data_y = data[target_label]
@@ -20,13 +24,21 @@ def get_X_y(data, target_label, drop_labels=[]):
 def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autosklearn=True, mislabels_percent=0.0, file_name=None, clean_validation_labels=False, cv_folds=None):
     data_y, data_X = get_X_y(data, target_label, drop_labels)
 
-    if use_autosklearn:
-        if type(feat_type) != type(None):
-            for ci in range(len(feat_type)):
-                if feat_type[ci] == 'Categorical':
-                    data_X[data_X.columns[ci]] = data_X[data_X.columns[ci]].astype('category')
+    for ci in range(len(feat_type)):
+        if feat_type[ci] == 'Categorical':
+            data_X[data_X.columns[ci]] = data_X[data_X.columns[ci]].apply(to_str)
 
+    data_X_val = data_X.values
 
+    for ci in range(len(feat_type)):
+        if feat_type[ci] == 'Categorical':
+            my_encoder = preprocessing.LabelEncoder()
+            data_X_val[:, ci] = my_encoder.fit_transform(data_X_val[:, ci])
+            for class_i in range(len(my_encoder.classes_)):
+                if my_encoder.classes_[class_i] == 'nan':
+                    data_X_val[data_X_val[:, ci] == class_i, ci] = np.NaN
+
+    y_val = preprocessing.LabelEncoder().fit_transform(data_y.values)
 
     scores = []
     result_models = []
@@ -35,7 +47,7 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
         model = None
 
         X_train = data_X.iloc[train_index, :]
-        y_train = copy.deepcopy(data_y.values[train_index])
+        y_train = y_val[train_index]
 
         y_train_all = copy.deepcopy(data_y.values[train_index])
 
@@ -70,6 +82,7 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
                     class_choice = np.delete(class_choice, [class_i], None)
                     new_value = np.random.choice(class_choice)
                     y_train[indices_all[class_i][change_i]] = new_value
+            y_train_all = y_train
 
             #print('error fraction: ' + str(np.sum(y_train != data_y.values[train_index]) / float(len(y_train))))
 
@@ -82,21 +95,21 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
                 resampling_strategy = 'cv'
                 resampling_strategy_arguments = {'folds': cv_folds}
             model = AutoSklearnModel(resampling_strategy=resampling_strategy, resampling_strategy_arguments=resampling_strategy_arguments)
-            model.fit(X=data_X.iloc[train_index, :], y=y_train_all, feat_type=feat_type)
+            model.fit(X=data_X_val[train_index, :], y=y_train_all, feat_type=feat_type)
         else:
             model = AutoGluonModel()
-            model.fit(X=data_X.iloc[train_index, :], y=y_train_all)
+            model.fit(X=data_X_val[train_index, :], y=y_train_all)
 
         result_models.append(copy.deepcopy(model))
 
-        y_pred = model.predict(data_X.iloc[test_index])
-        y_true = data_y.values[test_index]
+        y_pred = model.predict(data_X_val[test_index])
+        y_true = y_val[test_index]
         scores.append(balanced_accuracy_score(y_true, y_pred))
         print(scores)
 
         #compute permutation importance
 
-        r = permutation_importance(model, data_X.iloc[test_index], y_true, n_repeats=10, random_state=0)
+        r = permutation_importance(model, data_X_val[test_index], y_true, n_repeats=10, random_state=0)
         feature_importances.append(copy.deepcopy(r))
 
         if type(None) != type(file_name):
