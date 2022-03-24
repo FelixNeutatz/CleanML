@@ -83,6 +83,7 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
                     class_choice = np.delete(class_choice, [class_i], None)
                     new_value = np.random.choice(class_choice)
                     y_train[indices_all[class_i][change_i]] = new_value
+            y_train_all = y_train
 
             #print('error fraction: ' + str(np.sum(y_train != data_y.values[train_index]) / float(len(y_train))))
 
