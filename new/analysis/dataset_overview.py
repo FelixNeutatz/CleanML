@@ -112,18 +112,22 @@ pointer_dict['restaurant_duplicates']['drop_labels'] = ["streetAddress", "teleph
 
 
 def get_X_y(data, target_label, drop_labels=[]):
+    data_y = data[target_label]
     data_X = data.drop(target_label, 1)
     for drop_label in drop_labels:
         data_X = data_X.drop(drop_label, 1)
-    return data_X
+    return data_y, data_X
 
 table = ''
 for k, v in pointer_dict.items():
     clean = pd.read_csv(v['clean_path'])
-    X = get_X_y(clean, v['target'], v['drop_labels'])
+    y, X = get_X_y(clean, v['target'], v['drop_labels'])
+
+    number_classes = len(np.unique(y))
+
     print(str(k) + ': ' + str(X.shape))
     dataset = k.split('_')[0]
     error_type = k.split('_')[-1]
-    table += error_type + ' & ' + dataset + ' & ' + str(X.shape[0]) + ' & ' + str(X.shape[1]) + '\\\\ \n'
+    table += error_type + ' & ' + dataset + ' & ' + str(X.shape[0]) + ' & ' + str(X.shape[1]) + ' & ' + str(number_classes) + '\\\\ \n'
 
 print(table)

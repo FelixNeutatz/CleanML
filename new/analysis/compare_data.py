@@ -16,8 +16,11 @@ def remove_noise(my_str):
 #clean= pd.read_csv('/home/neutatz/Software/CleanML/data/USCensus/missing_values/impute_holoclean_train.csv')
 #dirty = pd.read_csv('/home/neutatz/Software/CleanML/data/USCensus/missing_values/dirty_train.csv')
 
-clean = pd.read_csv('/home/neutatz/Software/CleanML/data/Credit/outliers/clean_HC_impute_holoclean_train.csv')
-dirty = pd.read_csv('/home/neutatz/Software/CleanML/data/Credit/outliers/dirty_train.csv')
+#clean = pd.read_csv('/home/neutatz/Software/CleanML/data/Credit/outliers/clean_HC_impute_holoclean_train.csv')
+#dirty = pd.read_csv('/home/neutatz/Software/CleanML/data/Credit/outliers/dirty_train.csv')
+
+clean = pd.read_csv('/home/neutatz/Software/CleanML/data/University/inconsistency/clean_train.csv')
+dirty = pd.read_csv('/home/neutatz/Software/CleanML/data/University/inconsistency/dirty_train.csv')
 
 
 for col in clean.columns:
