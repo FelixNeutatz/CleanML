@@ -13,8 +13,8 @@ if __name__ == "__main__":
     parser.add_argument('-clean_validation_labels')
     args = parser.parse_args()
     clean_validation_labels = args.clean_validation_labels == 'True'
-    file_name = save_path + os.path.basename(__file__) + '_p' + str(args.mislabel_percent) + '_cvfolds_5_'
+    file_name = save_path + os.path.basename(__file__) + '_p' + str(args.mislabel_percent)
     run(clean_path, None, target_label, drop_labels, mislabel_percent=args.mislabel_percent, file_name=file_name,
-        avoid_clean_eval=True, cv_folds=5)
+        avoid_clean_eval=True)
 
 

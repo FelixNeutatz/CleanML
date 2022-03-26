@@ -1,5 +1,5 @@
 from schema.autosklearn_model.AutoSklearnModel import AutoSklearnModel
-from schema.autogluon.AutoGluonModel import AutoGluonModel
+#from schema.autogluon.AutoGluonModel import AutoGluonModel
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 from sklearn.metrics import balanced_accuracy_score
@@ -37,6 +37,12 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
             for class_i in range(len(my_encoder.classes_)):
                 if my_encoder.classes_[class_i] == 'nan':
                     data_X_val[data_X_val[:, ci] == class_i, ci] = np.NaN
+
+    print(data_X_val[0])
+    print(data_X_val.dtype)
+    print(feat_type)
+
+    data_X_val = data_X_val.astype('float64')
 
     y_val = preprocessing.LabelEncoder().fit_transform(data_y.values)
 
