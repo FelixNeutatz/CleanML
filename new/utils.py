@@ -1,5 +1,5 @@
 from schema.autosklearn_model.AutoSklearnModel import AutoSklearnModel
-#from schema.autogluon.AutoGluonModel import AutoGluonModel
+from schema.autogluon.AutoGluonModel import AutoGluonModel
 from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 from sklearn.metrics import balanced_accuracy_score
