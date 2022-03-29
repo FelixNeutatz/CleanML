@@ -29,7 +29,6 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
             data_X[data_X.columns[ci]] = data_X[data_X.columns[ci]].apply(to_str)
 
     data_X_val = data_X.values
-    data_X_val = data_X_val.astype('float64')
 
     for ci in range(len(feat_type)):
         if feat_type[ci] == 'Categorical':
@@ -38,6 +37,8 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
             for class_i in range(len(my_encoder.classes_)):
                 if my_encoder.classes_[class_i] == 'nan':
                     data_X_val[data_X_val[:, ci] == class_i, ci] = np.NaN
+
+    data_X_val = data_X_val.astype('float64')
 
     y_val = preprocessing.LabelEncoder().fit_transform(data_y.values)
     Workaround.number_of_features = np.sum(np.array(feat_type) == 'Numerical')
