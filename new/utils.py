@@ -29,6 +29,7 @@ def eval(data, target_label, fold_ids, drop_labels=[], feat_type=None, use_autos
             data_X[data_X.columns[ci]] = data_X[data_X.columns[ci]].apply(to_str)
 
     data_X_val = data_X.values
+    data_X_val = data_X_val.astype('float64')
 
     for ci in range(len(feat_type)):
         if feat_type[ci] == 'Categorical':

@@ -7,7 +7,7 @@ import time
 
 class AutoSklearnModel(ClassifierMixin, BaseEstimator, metaclass=ABCMeta):
     def __init__(self, resampling_strategy='holdout'):
-        self.autosklearn_model = autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=60*60, #20*60
+        self.autosklearn_model = autosklearn.classification.AutoSklearnClassifier(time_left_for_this_task=20*60, #20*60
                                                                              n_jobs=20,#20
                                                                              ml_memory_limit=200072,
                                                                              ensemble_memory_limit=200072,
