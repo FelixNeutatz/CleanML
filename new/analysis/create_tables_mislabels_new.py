@@ -9,7 +9,7 @@ def create_table(files, title):
         try:
             p005_val_false = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_p0.01_dirty.p"
             p01_val_false = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_p0.05_dirty.p"
-            p005_val_true = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_p0.05_clean_val_True__dirty.p"
+            p005_val_true = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_p0.1_dirty.p"
             p01_val_true = "/home/neutatz/data/cleanml_results/" + str(file_name) + "_p0.1_clean_val_True__dirty.p"
 
             my_latex_table += "%s & " % (file_name.split('.')[0],)
