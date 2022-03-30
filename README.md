@@ -16,12 +16,13 @@ cd CleanML
 exec bash
 conda create -n CleanML python=3.8
 conda activate CleanML
-git pull origin master
+git pull origin new_autoclean
 python -m pip install . 
-python -m pip install -U setuptools wheel
-python -m pip install -U "mxnet<2.0.0"
-python -m pip install autogluon
-python -m pip install scipy==1.7.0
+cd ..
+cd autosklearn
+git checkout cleanml
+python -m pip install .
+python -m pip install smac==0.12.1
 
 # download https://www.dropbox.com/s/nerfrhbrseev928/CleanML-datasets-2020.zip?dl=0
 
