@@ -211,5 +211,5 @@ if __name__ == '__main__':
         scores_dirty.append(s_dirty)
         scores_clean.append(s_clean)
 
-    print('dirty: ' + str(np.average(scores_dirty)))
-    print('clean: ' + str(np.average(scores_clean)))
+    print('dirty: ' + str(np.average(scores_dirty)) + ' +- ' + str(np.std(scores_dirty)))
+    print('clean: ' + str(np.average(scores_clean)) + ' +- ' + str(np.std(scores_clean)))
