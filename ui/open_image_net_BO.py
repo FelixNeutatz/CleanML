@@ -19,7 +19,7 @@ class Objective(object):
     def __call__(self, trial):
         # Calculate an objective value by using the extra arguments.
 
-        batch_size = trial.suggest_int("batch_size", 1, 100, log=True)
+        batch_size = trial.suggest_int("batch_size", 4, 100, log=True)
 
         train = tf.keras.preprocessing.image_dataset_from_directory(
             '/home/neutatz/phd2/new_image_test/train',
@@ -166,7 +166,8 @@ def get_score(X, y, train_index, test_index):
         shutil.copyfile(files_all[ii],
                         ('/home/neutatz/phd2/new_image_test/test/' + str(y[ii]) + '/image' + str(ii) + '.png'))
 
-    try_these_parameters_first = [{'batch_size': 8, 'use_imagenet': False, 'layer': "conv2_block3_out", "learning_rate": 0.0001, "epochs": 100}]
+    try_these_parameters_first = [{'batch_size': 8, 'use_imagenet': False, 'layer': "conv2_block3_out", "learning_rate": 0.0001, "epochs": 100},
+                                  {'batch_size': 20, 'use_imagenet': False, 'layer': "conv2_block3_out", "learning_rate": 0.0001, "epochs": 10}]
 
     study = optuna.create_study(direction='maximize', pruner=optuna.pruners.MedianPruner(n_startup_trials=2))
     study.enqueue_trial(try_these_parameters_first[0])
