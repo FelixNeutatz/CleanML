@@ -19,7 +19,8 @@ class Objective(object):
     def __call__(self, trial):
         # Calculate an objective value by using the extra arguments.
 
-        batch_size = trial.suggest_int("batch_size", 4, 100, log=True)
+        batch_size = trial.suggest_int("batch_size", 8, 100, log=True)
+        #batch_size = 8
 
         train = tf.keras.preprocessing.image_dataset_from_directory(
             '/home/neutatz/phd2/new_image_test/train',
