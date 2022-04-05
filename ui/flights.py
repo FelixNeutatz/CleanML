@@ -66,9 +66,9 @@ if __name__ == '__main__':
     y_to_use = y_val_dirty
     group_to_use = new_group_dirty
 
-    data_X = clean
-    y_to_use = y_val_clean
-    group_to_use = new_group_clean
+    #data_X = clean
+    #y_to_use = y_val_clean
+    #group_to_use = new_group_clean
 
     for ci in range(len(feat_type)):
         if feat_type[ci] == 'Categorical':
