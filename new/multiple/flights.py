@@ -9,6 +9,7 @@ import copy
 from sklearn.inspection import permutation_importance
 import pickle
 from sklearn.model_selection import GroupKFold
+from autosklearn.workaround.Workaround import Workaround
 
 def to_str(data):
     return str(data)
@@ -93,6 +94,8 @@ if __name__ == '__main__':
     scores = []
     result_models = []
     feature_importances = []
+
+    Workaround.number_of_features = np.sum(np.array(feat_type) == 'Numerical')
 
     for train_index, test_index in fold_ids:
         resampling_strategy_arguments = None
