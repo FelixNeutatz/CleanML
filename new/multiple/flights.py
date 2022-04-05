@@ -99,11 +99,7 @@ if __name__ == '__main__':
         skf_new = GroupKFold(n_splits=3)
         fold_ids_new = list(skf_new.split(data_X_val[train_index, :], y=y_to_use[train_index], groups=group_to_use[train_index]))
 
-        resampling_strategy = sklearn.model_selection.PredefinedSplit(
-            test_fold=fold_ids[0][1]
-        )
-
-        model = AutoSklearnModel(resampling_strategy=resampling_strategy)
+        model = AutoSklearnModel(resampling_strategy=sklearn.model_selection.PredefinedSplit, resampling_strategy_arguments={'test_fold': fold_ids[0][1]})
         model.fit(X=data_X_val[train_index, :], y=y_to_use[train_index], feat_type=feat_type)
 
         result_models.append(copy.deepcopy(model))
