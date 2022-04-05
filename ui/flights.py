@@ -24,19 +24,14 @@ def to_str(data):
 if __name__ == '__main__':
 
     save_path = '/home/neutatz/data/cleanml_results/'
-    file_name = save_path + os.path.basename(__file__)
+    file_name = save_path + os.path.basename(__file__) + 'dirty'
 
     clean = pd.read_csv('/home/neutatz/phd2/clean_autoMl/data/flights_clean.csv')
     dirty = pd.read_csv('/home/neutatz/phd2/clean_autoMl/data/flights_dirty.csv')
 
-    #grouping
-    cols = ['Airline', 'Flight Number', 'dep_airport', 'arr_airport']
-    new_group = clean[cols].apply(lambda row: '_'.join(row.values.astype(str)), axis=1).values
+    clean['Flight Number'] = clean['Flight Number'].apply(to_str)
+    dirty['Flight Number'] = dirty['Flight Number'].apply(to_str)
 
-    print(new_group)
-
-    print(np.sum(clean['more_than_5_minutes_delay']) / len(clean))
-    print(np.sum(dirty['more_than_5_minutes_delay']) / len(dirty))
 
     y_clean = clean['more_than_5_minutes_delay'].values
     y_dirty = dirty['more_than_5_minutes_delay'].values
@@ -44,22 +39,36 @@ if __name__ == '__main__':
     clean = clean.drop(columns=['more_than_5_minutes_delay'])
     dirty = dirty.drop(columns=['more_than_5_minutes_delay'])
 
+    # grouping
+    cols = ['Airline', 'Flight Number', 'dep_airport', 'arr_airport']
+    new_group_clean = clean[cols].apply(lambda row: '_'.join(row.values.astype(str)), axis=1).values
+    new_group_dirty = dirty[cols].apply(lambda row: '_'.join(row.values.astype(str)), axis=1).values
+
     assert len(clean) == len(dirty)
 
     skf = GroupKFold(n_splits=5)
-    fold_ids = list(skf.split(clean.values, y_clean, groups=new_group))
+    fold_ids = list(skf.split(clean.values, y_clean, groups=new_group_clean))
 
-    scores_clean = []
-    scores_dirty = []
+    label_encoder = preprocessing.LabelEncoder()
+    y_val_clean = label_encoder.fit_transform(y_clean)
+    y_val_dirty = label_encoder.transform(y_dirty)
 
-    y_val = preprocessing.LabelEncoder().fit_transform(y_clean)
-
-    data_X = clean
 
     feat_type = [
         'Categorical' if str(x) == 'object' else 'Numerical'
-        for x in data_X.dtypes
+        for x in clean.dtypes
     ]
+
+    print(feat_type)
+    print(clean.columns)
+
+    data_X = dirty
+    y_to_use = y_val_dirty
+    group_to_use = new_group_dirty
+
+    data_X = clean
+    y_to_use = y_val_clean
+    group_to_use = new_group_clean
 
     for ci in range(len(feat_type)):
         if feat_type[ci] == 'Categorical':
@@ -82,16 +91,9 @@ if __name__ == '__main__':
     feature_importances = []
 
     for train_index, test_index in fold_ids:
-        #resampling_strategy = 'holdout'
         resampling_strategy_arguments = None
-
-        print(data_X_val[train_index, :])
-
         skf_new = GroupKFold(n_splits=3)
-        fold_ids_new = list(skf_new.split(data_X_val[train_index, :], y=y_val[train_index], groups=new_group[train_index]))
-
-
-        print(len(fold_ids_new[0][1]))
+        fold_ids_new = list(skf_new.split(data_X_val[train_index, :], y=y_to_use[train_index], groups=group_to_use[train_index]))
 
         resampling_strategy = sklearn.model_selection.PredefinedSplit(
             test_fold=fold_ids[0][1]
@@ -99,7 +101,7 @@ if __name__ == '__main__':
 
         model = AutoSklearnModel(resampling_strategy=resampling_strategy,
                                  resampling_strategy_arguments=resampling_strategy_arguments)
-        model.fit(X=data_X_val[train_index, :], y=y_val[train_index], feat_type=feat_type)
+        model.fit(X=data_X_val[train_index, :], y=y_to_use[train_index], feat_type=feat_type)
 
         result_models.append(copy.deepcopy(model))
 
