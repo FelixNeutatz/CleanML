@@ -24,7 +24,7 @@ def to_str(data):
 if __name__ == '__main__':
 
     save_path = '/home/neutatz/data/cleanml_results/'
-    file_name = save_path + os.path.basename(__file__) + 'dirty'
+    file_name = save_path + os.path.basename(__file__) + 'clean'
 
     clean = pd.read_csv('/home/neutatz/phd2/clean_autoMl/data/flights_clean.csv')
     dirty = pd.read_csv('/home/neutatz/phd2/clean_autoMl/data/flights_dirty.csv')
