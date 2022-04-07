@@ -134,4 +134,4 @@ if __name__ == '__main__':
 
             with open(file_name, "wb") as pickle_model_file:
                 pickle.dump(result_dict, pickle_model_file)
-        break
+
