@@ -29,12 +29,23 @@ if __name__ == '__main__':
     clean = pd.read_csv('/home/neutatz/phd2/clean_autoMl/data/flights_clean.csv')
     dirty = pd.read_csv('/home/neutatz/phd2/clean_autoMl/data/flights_dirty.csv')
 
+    print(clean.shape)
+
     clean['Flight Number'] = clean['Flight Number'].apply(to_str)
     dirty['Flight Number'] = dirty['Flight Number'].apply(to_str)
 
 
     y_clean = clean['more_than_5_minutes_delay'].values
     y_dirty = dirty['more_than_5_minutes_delay'].values
+
+    #print(np.unique(y_clean, return_counts=True))
+
+    print(np.sum(y_clean != y_dirty) / len(clean))
+
+    #print(np.sum(np.isnan(dirty.values) == True))
+    print(np.sum(pd.isna(dirty['sched_dep_time'].values))/ len(clean))
+    print(np.sum(pd.isna(dirty['act_dep_time'].values))/ len(clean))
+    print(np.sum(pd.isna(dirty['sched_arr_time'].values))/ len(clean))
 
     clean = clean.drop(columns=['more_than_5_minutes_delay'])
     dirty = dirty.drop(columns=['more_than_5_minutes_delay'])
@@ -96,17 +107,18 @@ if __name__ == '__main__':
         fold_ids_new = list(skf_new.split(data_X_val[train_index, :], y=y_to_use[train_index], groups=group_to_use[train_index]))
 
         resampling_strategy = sklearn.model_selection.PredefinedSplit(
-            test_fold=fold_ids[0][1]
+            test_fold=fold_ids_new[0][1]
         )
 
-        model = AutoSklearnModel(resampling_strategy=resampling_strategy,
-                                 resampling_strategy_arguments=resampling_strategy_arguments)
+        #model = AutoSklearnModel(resampling_strategy=resampling_strategy,
+        #                         resampling_strategy_arguments=resampling_strategy_arguments)
+        model = AutoSklearnModel()
         model.fit(X=data_X_val[train_index, :], y=y_to_use[train_index], feat_type=feat_type)
 
         result_models.append(copy.deepcopy(model))
 
         y_pred = model.predict(data_X_val[test_index])
-        y_true = y_clean[test_index]
+        y_true = y_val_clean[test_index]
         scores.append(balanced_accuracy_score(y_true, y_pred))
         print(scores)
 
