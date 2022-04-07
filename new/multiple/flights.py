@@ -32,6 +32,8 @@ if __name__ == '__main__':
     y_clean = clean['more_than_5_minutes_delay'].values
     y_dirty = dirty['more_than_5_minutes_delay'].values
 
+    print(np.unique(y_dirty))
+
     #print(np.unique(y_clean, return_counts=True))
 
     print(np.sum(y_clean != y_dirty) / len(clean))
@@ -58,6 +60,8 @@ if __name__ == '__main__':
     y_val_clean = label_encoder.fit_transform(y_clean)
     y_val_dirty = label_encoder.transform(y_dirty)
 
+
+    print(np.unique(y_val_clean))
 
     feat_type = [
         'Categorical' if str(x) == 'object' else 'Numerical'
@@ -97,18 +101,23 @@ if __name__ == '__main__':
 
     Workaround.number_of_features = np.sum(np.array(feat_type) == 'Numerical')
 
+    print(np.unique(y_to_use))
+
     for train_index, test_index in fold_ids:
         resampling_strategy_arguments = None
         skf_new = GroupKFold(n_splits=3)
         fold_ids_new = list(skf_new.split(data_X_val[train_index, :], y=y_to_use[train_index], groups=group_to_use[train_index]))
 
-        model = AutoSklearnModel(resampling_strategy=sklearn.model_selection.PredefinedSplit, resampling_strategy_arguments={'test_fold': fold_ids[0][1]})
+        #model = AutoSklearnModel(resampling_strategy=sklearn.model_selection.PredefinedSplit, resampling_strategy_arguments={'test_fold': fold_ids_new[0][1]})
+        model = AutoSklearnModel()
+        #model = AutoSklearnModel(resampling_strategy=sklearn.model_selection.PredefinedSplit(test_fold=fold_ids_new[0][1]))
+
         model.fit(X=data_X_val[train_index, :], y=y_to_use[train_index], feat_type=feat_type)
 
         result_models.append(copy.deepcopy(model))
 
         y_pred = model.predict(data_X_val[test_index])
-        y_true = y_clean[test_index]
+        y_true = y_val_clean[test_index]
         scores.append(balanced_accuracy_score(y_true, y_pred))
         print(scores)
 
@@ -125,3 +134,4 @@ if __name__ == '__main__':
 
             with open(file_name, "wb") as pickle_model_file:
                 pickle.dump(result_dict, pickle_model_file)
+        break
